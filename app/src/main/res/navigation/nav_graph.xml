@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/timerFragment">
+    <fragment
+        android:id="@+id/timerFragment"
+        android:name="com.example.pomodorotimer.presentation.TimerFragment"
+        android:label="fragment_timer"
+        tools:layout="@layout/fragment_timer" >
+        <action
+            android:id="@+id/action_timerFragment_to_historyFragment"
+            app:destination="@id/historyFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="com.example.pomodorotimer.presentation.HistoryFragment"
+        android:label="history_fragment"
+        tools:layout="@layout/history_fragment" >
+        <action
+            android:id="@+id/action_historyFragment_to_timerFragment"
+            app:destination="@id/timerFragment" />
+    </fragment>
+</navigation>

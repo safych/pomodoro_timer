@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Pomodoro Timer</string>
+    <string name="work">Work</string>
+    <string name="hobby">Hobby</string>
+    <string name="education">Education</string>
+    <string name="relax">Relax</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="deleteData">Do you want to delete data?</string>
+    <string name="noData">No Data</string>
+    <string name="spinRotary">Spin your rotary</string>
+    <string name="changeActivity">Do you want to change activity?</string>
+    <string name="resetPomodoro">Do you want to reset pomodoro?</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="hello_world">From the Square world,\nHello, %1$s!</string>
+</resources>

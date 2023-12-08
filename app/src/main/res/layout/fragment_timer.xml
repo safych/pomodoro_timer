@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@android:color/black"
+    tools:context="com.example.pomodorotimer.presentation.TimerFragment">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.pomodorotimer.presentation.viewmodel.TimerViewModel" />
+        
+        <variable
+            name="timerFragment"
+            type="com.example.pomodorotimer.presentation.TimerFragment" />
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <requestFocus
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center" >
+
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="26sp"
+                android:gravity="center"
+                android:layout_marginTop="30dp"
+                />
+
+            <ImageButton
+                android:id="@+id/playPauseButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:src="@drawable/baseline_play_arrow_24"
+                android:background="@drawable/round_button" />
+
+            <TextView
+                android:id="@+id/status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"
+                android:gravity="center"
+                />
+
+            <ImageButton
+                android:id="@+id/historyButton"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/baseline_history_24"
+                android:background="@drawable/round_button"
+                android:onClick="@{() -> timerFragment.moveToHistory()}" />
+
+            <ImageButton
+                android:id="@+id/stopButton"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginTop="5dp"
+                android:visibility="invisible"
+                android:src="@drawable/baseline_stop_24"
+                android:background="@drawable/round_button" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="210dp"
+                android:layout_height="230dp"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:indeterminate="false"
+                android:layout_marginTop="-173dp"
+                android:progress="0"
+                android:max="100"
+                android:progressDrawable="@drawable/circular_progress_bar" />
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</layout>
