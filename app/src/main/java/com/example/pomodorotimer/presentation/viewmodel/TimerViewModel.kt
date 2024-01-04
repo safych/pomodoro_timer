@@ -1,7 +1,6 @@
 package com.example.pomodorotimer.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
-import java.time.LocalDate
 
 class TimerViewModel : ViewModel() {
     private var status: String = ""
@@ -23,8 +22,13 @@ class TimerViewModel : ViewModel() {
     }
 
     fun moveToNextActivity() {
-        periodActivity[activity] = 0
         if(activity != 2) activity += 1 else activity = 0
+        setTypeActivity()
+        checkStatus()
+    }
+
+    fun moveToPreviousActivity() {
+        if(activity == 0) activity = 2 else activity -= 1
         setTypeActivity()
         checkStatus()
     }
@@ -40,7 +44,7 @@ class TimerViewModel : ViewModel() {
     private fun checkStatus() {
         status = when(periodActivity[activity]) {
             in arrayOf(0, 2, 4, 6) -> typeActivity
-            else -> "Relax"
+            else -> "$typeActivity Relax"
         }
     }
 }

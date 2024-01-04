@@ -66,7 +66,7 @@
                 android:onClick="@{() -> timerFragment.moveToHistory()}" />
 
             <ImageButton
-                android:id="@+id/stopButton"
+                android:id="@+id/resetButton"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_marginTop="5dp"
@@ -76,7 +76,7 @@
 
             <ProgressBar
                 android:id="@+id/progressBar"
-                android:layout_width="210dp"
+                android:layout_width="match_parent"
                 android:layout_height="230dp"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:indeterminate="false"

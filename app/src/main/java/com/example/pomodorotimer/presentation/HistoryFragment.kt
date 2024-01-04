@@ -2,15 +2,12 @@ package com.example.pomodorotimer.presentation
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
-import android.view.View.OnLongClickListener
 import androidx.core.view.InputDeviceCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -21,17 +18,12 @@ import com.example.pomodorotimer.databinding.HistoryFragmentBinding
 import com.example.pomodorotimer.presentation.viewmodel.HistoryViewModel
 import com.example.pomodorotimer.presentation.viewmodel.WorkIntervalViewModelFactory
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 
 class HistoryFragment : Fragment() {
@@ -92,10 +84,13 @@ class HistoryFragment : Fragment() {
         }
 
         view.setOnGenericMotionListener { _, ev ->
-            if (ev.action == MotionEvent.ACTION_SCROLL &&
-                ev.isFromSource(InputDeviceCompat.SOURCE_ROTARY_ENCODER)
-            ) {
-                changePosition()
+            if (ev.action == MotionEvent.ACTION_SCROLL && ev.isFromSource(InputDeviceCompat.SOURCE_ROTARY_ENCODER)) {
+                val axisValue = ev.getAxisValue(MotionEvent.AXIS_SCROLL)
+                if (axisValue > 0.0f) {
+                    moveToPrevious()
+                } else if (axisValue < 0.0f) {
+                    moveToNext()
+                }
                 textDate.text = getFormattedDateForPosition()
                 historyViewModel.setTime(getDate(textDate))
 
@@ -109,6 +104,14 @@ class HistoryFragment : Fragment() {
                 false
             }
         }
+    }
+
+    private fun moveToNext() {
+        if (number == dateList.size-1) number = 0 else number += 1
+    }
+
+    private fun moveToPrevious() {
+        if (number == 0) number = 0 else number -= 1
     }
 
     private fun getDate(textDate: TextView): LocalDate {
@@ -129,7 +132,8 @@ class HistoryFragment : Fragment() {
         val positiveButton = dialogView.findViewById<ImageButton>(R.id.positive_button)
         positiveButton.setOnClickListener {
             historyViewModel.deleteByDate(date)
-            findNavController().navigate(R.id.action_historyFragment_to_timerFragment)
+            clearAndReloadDateList()
+            refreshFragment()
             alert.dismiss()
         }
 
@@ -141,8 +145,20 @@ class HistoryFragment : Fragment() {
         alert.show()
     }
 
-    private fun changePosition() {
-        if (number == dateList.size-1) number = 0 else number += 1
+    private fun refreshFragment() {
+        findNavController().run {
+            popBackStack()
+            navigate(R.id.historyFragment)
+        }
+    }
+
+    private fun clearAndReloadDateList() {
+        dateList.clear()
+        lifecycleScope.launch {
+            historyViewModel.workIntervalDates.collect { workIntervals ->
+                dateList.addAll(workIntervals)
+            }
+        }
     }
 
     private fun getFormattedDateForPosition(): String {

@@ -1,65 +1,32 @@
 package com.example.pomodorotimer.presentation
 
-import android.app.Activity
-import android.app.AlarmManager
 import android.app.AlertDialog
-import android.app.KeyguardManager
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.Handler
-import android.os.PowerManager
-import android.os.SystemClock
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnLongClickListener
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.ProgressBar
-import android.widget.RemoteViews
 import android.widget.TextView
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationCompat.PRIORITY_MAX
-import androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC
-import androidx.core.app.ServiceCompat.startForeground
-import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.InputDeviceCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.work.BackoffPolicy
-import androidx.work.Constraints
-import androidx.work.Data
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.WorkRequest
 import com.example.pomodorotimer.R
 import com.example.pomodorotimer.databinding.FragmentTimerBinding
 import com.example.pomodorotimer.presentation.viewmodel.HistoryViewModel
 import com.example.pomodorotimer.presentation.viewmodel.TimerViewModel
 import com.example.pomodorotimer.presentation.viewmodel.WorkIntervalViewModelFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.Serializable
 import java.time.Duration
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
-import java.util.concurrent.TimeUnit
 
 class TimerFragment : Fragment(), Serializable {
     private val historyViewModel: HistoryViewModel by activityViewModels {
@@ -93,9 +60,11 @@ class TimerFragment : Fragment(), Serializable {
     private lateinit var timeView: TextView
     private lateinit var playPauseButton: ImageButton
     private lateinit var historyButton: ImageButton
-    private lateinit var stopButton: ImageButton
+    private lateinit var resetButton: ImageButton
 
     private lateinit var vibrateService: Intent
+
+    private var dialogChangeActivity = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -136,7 +105,7 @@ class TimerFragment : Fragment(), Serializable {
         timeView = view.findViewById(R.id.time)
         playPauseButton = view.findViewById(R.id.playPauseButton)
         historyButton = view.findViewById(R.id.historyButton)
-        stopButton = view.findViewById(R.id.stopButton)
+        resetButton = view.findViewById(R.id.resetButton)
         progressBar = view.findViewById(R.id.progressBar)
 
         playPauseButton.setOnClickListener {
@@ -152,7 +121,7 @@ class TimerFragment : Fragment(), Serializable {
             true
         })
 
-        stopButton.setOnClickListener {
+        resetButton.setOnClickListener {
             resetPomodoro()
         }
 
@@ -160,7 +129,15 @@ class TimerFragment : Fragment(), Serializable {
             if (ev.action == MotionEvent.ACTION_SCROLL &&
                 ev.isFromSource(InputDeviceCompat.SOURCE_ROTARY_ENCODER)
             ) {
-                changeActivity()
+                val axisValue = ev.getAxisValue(MotionEvent.AXIS_SCROLL)
+                if (axisValue > 0.0f) {
+                    sharedViewModel.moveToPreviousActivity()
+                } else if (axisValue < 0.0f) {
+                    sharedViewModel.moveToNextActivity()
+                }
+
+                statusView.text = sharedViewModel.getStatus()
+                setRemainingMilliseconds(-1)
                 true
             } else {
                 false
@@ -179,31 +156,6 @@ class TimerFragment : Fragment(), Serializable {
 
         val positiveButton = dialogView.findViewById<ImageButton>(R.id.positive_button)
         positiveButton.setOnClickListener {
-            setRemainingMilliseconds(-1)
-            alert.dismiss()
-        }
-
-        val negativeButton = dialogView.findViewById<ImageButton>(R.id.negative_button)
-        negativeButton.setOnClickListener {
-            alert.dismiss()
-        }
-
-        alert.show()
-    }
-
-    private fun changeActivity() {
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.custom_dialog, null)
-
-        val builder = AlertDialog.Builder(context)
-        builder.setView(dialogView)
-        val alert = builder.create()
-
-        dialogView.findViewById<TextView>(R.id.textQuestion).text = getString(R.string.changeActivity)
-
-        val positiveButton = dialogView.findViewById<ImageButton>(R.id.positive_button)
-        positiveButton.setOnClickListener {
-            sharedViewModel.moveToNextActivity()
-            statusView.text = sharedViewModel.getStatus()
             setRemainingMilliseconds(-1)
             alert.dismiss()
         }
@@ -280,14 +232,14 @@ class TimerFragment : Fragment(), Serializable {
     private fun changeButtons() {
         if(isImage1Displayed) {
             historyButton.isVisible = false
-            stopButton.isVisible = false
+            resetButton.isVisible = false
             progressBar.isVisible = true
             sharedViewModel.start()
             statusView.text = sharedViewModel.getStatus()
             startTimer()
         } else {
             progressBar.isVisible = false
-            stopButton.isVisible = true
+            resetButton.isVisible = true
             startTimer()
         }
         isImage1Displayed = !isImage1Displayed
