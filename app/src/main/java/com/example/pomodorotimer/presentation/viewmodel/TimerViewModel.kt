@@ -17,24 +17,24 @@ class TimerViewModel : ViewModel() {
     }
 
     fun skipToNext() {
-        if(periodActivity[activity] != 7) periodActivity[activity] += 1 else periodActivity[activity] = 0
+        if (periodActivity[activity] != 7) periodActivity[activity] += 1 else periodActivity[activity] = 0
         checkStatus()
     }
 
     fun moveToNextActivity() {
-        if(activity != 2) activity += 1 else activity = 0
+        if (activity != 2) activity += 1 else activity = 0
         setTypeActivity()
         checkStatus()
     }
 
     fun moveToPreviousActivity() {
-        if(activity == 0) activity = 2 else activity -= 1
+        if (activity == 0) activity = 2 else activity -= 1
         setTypeActivity()
         checkStatus()
     }
 
     private fun setTypeActivity() {
-        typeActivity = when(activity) {
+        typeActivity = when (activity) {
             0 -> "Work"
             1 -> "Hobby"
             else -> "Education"
@@ -42,7 +42,7 @@ class TimerViewModel : ViewModel() {
     }
 
     private fun checkStatus() {
-        status = when(periodActivity[activity]) {
+        status = when (periodActivity[activity]) {
             in arrayOf(0, 2, 4, 6) -> typeActivity
             else -> "$typeActivity Relax"
         }

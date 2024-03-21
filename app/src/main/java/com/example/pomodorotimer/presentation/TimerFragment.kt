@@ -64,10 +64,9 @@ class TimerFragment : Fragment(), Serializable {
 
     private lateinit var vibrateService: Intent
 
-    private var dialogChangeActivity = false
-
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         val fragmentBinding = FragmentTimerBinding.inflate(inflater, container, false)
@@ -96,10 +95,6 @@ class TimerFragment : Fragment(), Serializable {
         findNavController().navigate(R.id.action_timerFragment_to_historyFragment)
     }
 
-    private fun setRemainingMilliseconds(time: Long) {
-        remainingMilliseconds = time
-    }
-
     private fun bindingTimer(view: View) {
         statusView = view.findViewById(R.id.status)
         timeView = view.findViewById(R.id.time)
@@ -109,14 +104,14 @@ class TimerFragment : Fragment(), Serializable {
         progressBar = view.findViewById(R.id.progressBar)
 
         playPauseButton.setOnClickListener {
-            if(!isImage1Displayed) context.stopService(vibrateService)
+            if (!isImage1Displayed) context.stopService(vibrateService)
             changeButtons()
         }
 
         playPauseButton.setOnLongClickListener(OnLongClickListener {
             sharedViewModel.skipToNext()
             statusView.text = sharedViewModel.getStatus()
-            setRemainingMilliseconds(-1)
+            remainingMilliseconds = -1
             changeButtons()
             true
         })
@@ -137,7 +132,7 @@ class TimerFragment : Fragment(), Serializable {
                 }
 
                 statusView.text = sharedViewModel.getStatus()
-                setRemainingMilliseconds(-1)
+                remainingMilliseconds = -1
                 true
             } else {
                 false
@@ -156,7 +151,7 @@ class TimerFragment : Fragment(), Serializable {
 
         val positiveButton = dialogView.findViewById<ImageButton>(R.id.positive_button)
         positiveButton.setOnClickListener {
-            setRemainingMilliseconds(-1)
+            remainingMilliseconds = -1
             alert.dismiss()
         }
 
@@ -174,8 +169,8 @@ class TimerFragment : Fragment(), Serializable {
 
         val duration = Duration.between(currentTime, targetTime)
 
-        val millisecondsRemaining : Long = if(remainingMilliseconds < 0) {
-           totalMillis = duration.toMillis()
+        val millisecondsRemaining : Long = if (remainingMilliseconds < 0) {
+            totalMillis = duration.toMillis()
             duration.toMillis()
         } else {
             remainingMilliseconds
@@ -191,7 +186,7 @@ class TimerFragment : Fragment(), Serializable {
                     val millisUntilFinished = millisUntilFinished
                     val progress = (millisUntilFinished.toFloat() / totalMillis!! * 100).toInt()
                     val secondsRemaining = millisUntilFinished / 1000
-                    setRemainingMilliseconds(millisUntilFinished)
+                    remainingMilliseconds = millisUntilFinished
 
                     updateTimeUI(secondsRemaining)
                     progressBar.progress = progress
@@ -199,7 +194,7 @@ class TimerFragment : Fragment(), Serializable {
 
                 override fun onFinish() {
                     insertWorkInterval()
-                    setRemainingMilliseconds(-1)
+                    remainingMilliseconds = -1
                     sharedViewModel.skipToNext()
                     statusView.text = sharedViewModel.getStatus()
                     changeButtons()
@@ -218,7 +213,7 @@ class TimerFragment : Fragment(), Serializable {
         val seconds = millisecondsRemaining % 60000
         val text = String.format("%02d:%02d", minutes, seconds)
 
-        return if(remainingMilliseconds < 0) text else text.substring(0, text.length-3)
+        return if (remainingMilliseconds < 0) text else text.substring(0, text.length-3)
     }
 
     private fun updateTimeUI(secondsRemaining: Long) {
@@ -230,7 +225,7 @@ class TimerFragment : Fragment(), Serializable {
     }
 
     private fun changeButtons() {
-        if(isImage1Displayed) {
+        if (isImage1Displayed) {
             historyButton.isVisible = false
             resetButton.isVisible = false
             progressBar.isVisible = true

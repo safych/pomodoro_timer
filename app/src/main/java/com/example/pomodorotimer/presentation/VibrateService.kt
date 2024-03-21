@@ -1,21 +1,21 @@
 package com.example.pomodorotimer.presentation
 
 import android.app.AlarmManager
-import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Handler
 import android.os.IBinder
 import android.os.SystemClock
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.pomodorotimer.R
 
 class VibrateService : Service() {
     private var alarmManager: AlarmManager? = null
+    private var notificationManager: NotificationManager? = null
     private val channelId = "channel_vibrate"
     private val notificationId = 1
     private val notificationUpdateInterval = 540000L
@@ -27,8 +27,19 @@ class VibrateService : Service() {
     override fun onCreate() {
         super.onCreate()
         isServiceRunning = true
+        createNotificationChannel()
         startForegroundService()
         startNotificationUpdates()
+    }
+
+    private fun createNotificationChannel() {
+        notificationManager = getSystemService(NotificationManager::class.java)
+        val channel = NotificationChannel(
+            channelId,
+            "Foreground Service Channel",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        notificationManager!!.createNotificationChannel(channel)
     }
 
     private fun startForegroundService() {
@@ -63,9 +74,7 @@ class VibrateService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val millisecondsRemaining = intent?.getLongExtra("millisecondsRemaining", 0)
         remainingTime = millisecondsRemaining ?: 0
-
         scheduleAlarm(remainingTime)
-
         return START_STICKY
     }
 
@@ -75,6 +84,7 @@ class VibrateService : Service() {
         handler.removeCallbacksAndMessages(null)
         cancelAlarm()
         stopForeground(true)
+        notificationManager!!.deleteNotificationChannel(channelId)
         stopSelf()
     }
 

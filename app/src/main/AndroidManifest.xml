@@ -31,17 +31,14 @@
             android:enabled="true"
             android:exported="false" />
 
-        <!--
-               Set to true if your app is Standalone, that is, it does not require the handheld
-               app to run.
-        -->
         <meta-data
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
 
         <activity
             android:name=".presentation.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:taskAffinity="">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

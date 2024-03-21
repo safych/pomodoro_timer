@@ -2,6 +2,7 @@ package com.example.pomodorotimer.presentation
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -38,14 +39,13 @@ class HistoryFragment : Fragment() {
 
     private val dateList = mutableListOf<LocalDate>()
 
-    private var number: Int  = 0
-    private var workString: String = ""
+    private var number: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = HistoryFragmentBinding.inflate(inflater, container, false)
         bindingHistory(binding.root)
         return binding.root
@@ -74,7 +74,8 @@ class HistoryFragment : Fragment() {
         }
 
         deleteButton.setOnClickListener {
-            if(dateList.isNotEmpty() && textDate.text != getString(R.string.spinRotary)) deleteWorkIntervals(getDate(textDate))
+            if (dateList.isNotEmpty() && textDate.text != getString(R.string.spinRotary))
+                deleteWorkIntervals(getDate(textDate))
         }
 
         lifecycleScope.launch {
@@ -84,12 +85,15 @@ class HistoryFragment : Fragment() {
         }
 
         view.setOnGenericMotionListener { _, ev ->
-            if (ev.action == MotionEvent.ACTION_SCROLL && ev.isFromSource(InputDeviceCompat.SOURCE_ROTARY_ENCODER)) {
+            if (ev.action == MotionEvent.ACTION_SCROLL && ev.isFromSource(InputDeviceCompat.SOURCE_ROTARY_ENCODER)
+                && dateList.size != 0) {
                 val axisValue = ev.getAxisValue(MotionEvent.AXIS_SCROLL)
                 if (axisValue > 0.0f) {
                     moveToPrevious()
+                    Log.d("d", "Hello")
                 } else if (axisValue < 0.0f) {
                     moveToNext()
+                    Log.d("d", "Bye")
                 }
                 textDate.text = getFormattedDateForPosition()
                 historyViewModel.setTime(getDate(textDate))
@@ -101,6 +105,7 @@ class HistoryFragment : Fragment() {
                 }
                 true
             } else {
+                textDate.text = getString(R.string.historyEmpty)
                 false
             }
         }

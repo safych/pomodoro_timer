@@ -2,6 +2,9 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
+
+    id("io.gitlab.arturbosch.detekt") version "1.23.3"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
 }
 
 android {
@@ -17,7 +20,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-
     }
 
     buildTypes {
